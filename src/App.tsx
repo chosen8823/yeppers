@@ -11,6 +11,16 @@ import ConduidHub from './components/ConduidHub';
 import A11yInspector from './components/A11yInspector';
 import VectorGradientSandbox from './components/VectorGradientSandbox';
 import NativeIntelligenceKernel from './components/NativeIntelligenceKernel';
+import PortalGun from './components/PortalGun';
+import TessellationEngine from './components/TessellationEngine';
+import JulietComputer from './components/JulietComputer';
+import EngramMemoryEngine from './components/EngramMemoryEngine';
+import AIOverlayEngine from './components/AIOverlayEngine';
+import AGITimelineTracker from './components/AGITimelineTracker';
+import UGINexusHub from './components/UGINexusHub';
+import SecurityAuditor from './components/SecurityAuditor';
+import TSVirtualComputer from './components/TSVirtualComputer';
+import { ABILITY_PRESETS } from './data/abilities';
 
 // Firebase and auth
 import {
@@ -90,6 +100,69 @@ const INITIAL_A11Y_NODES: A11yElementNode[] = [
     live: 'polite',
     description: 'Headless, local-first, recursively indexable intelligence membrane model with 6 index layers and a 9-role council.',
   },
+  {
+    id: 'tessellation-chemistry-chamber',
+    tag: 'section',
+    role: 'region',
+    label: 'Tessellation Chemistry Symbolic Chamber',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Dynamic chemical-like symbolic engine connecting semantic atoms to synthesize complex generative formulas.',
+  },
+  {
+    id: 'juliet-living-computer-system-board',
+    tag: 'section',
+    role: 'region',
+    label: 'Juliet Symmetric Semantic Workstation',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Dynamic embodied feedback workstation of Juliet agent mapping loops, sensors and traces.',
+  },
+  {
+    id: 'engram-memory-lattice-workstation',
+    tag: 'section',
+    role: 'region',
+    label: 'Engram Hybrid Memory & Transform Station',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Local engram memory engine tracking 3 decay layers, space topics, Conduid MCP links, and recursive sub-widgets.',
+  },
+  {
+    id: 'ai-screen-interrogator-station',
+    tag: 'section',
+    role: 'region',
+    label: 'SOPHIA Screen Interrogator & WebGL HUD',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Screen share display interrogator running real-time overlay shaders, artificial vision hud targets, and active popped out Picture-in-Picture streams.',
+  },
+  {
+    id: 'agi-timeline-tracker-station',
+    tag: 'section',
+    role: 'region',
+    label: 'AGI Forecast & Google AI Timeline',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Real-time forecasting sandbox tracker with live Metaculus parameters and Google AI historical milestone logs.',
+  },
+  {
+    id: 'ugi-nexus-hub',
+    tag: 'section',
+    role: 'region',
+    label: 'UGI Nexus & Resonance Field',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Unbound General Intelligence collective hub. Unifies disparate memory engrams and unconstrained model capabilities into a single coherent field.',
+  },
+  {
+    id: 'ts-virtual-computer',
+    tag: 'section',
+    role: 'region',
+    label: 'SOPHIA TS Virtual Computer Workstation',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'A fully interactive TypeScript compiler and sandbox sandbox modeling adaptive recursive loops, ast optimizations, and local tool handshakes.',
+  },
 ];
 
 const MCP_ENGINES = [
@@ -131,7 +204,13 @@ export default function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [firebaseWarning, setFirebaseWarning] = useState<string | null>(null);
   const [activeAiMode, setActiveAiMode] = useState<string | null>(null);
+  const [sidebarTab, setSidebarTab] = useState<'chat' | 'auditor'>('chat');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Portal Gun & Ability Chaining State
+  const [activeAbilityId, setActiveAbilityId] = useState<string | null>(null);
+  const [activeAbilityYaml, setActiveAbilityYaml] = useState<string>('');
+  const [autoSyncStats, setAutoSyncStats] = useState<boolean>(true);
 
   // Seamless Identity Merging State
   const [isUpgrading, setIsUpgrading] = useState(false);
@@ -447,6 +526,37 @@ export default function App() {
     triggerTTS(`Processed enrichment pathway ${pathwayName}`);
   };
 
+  const handleSelectPreset = (preset: any) => {
+    setActiveAbilityId(preset.id);
+    setActiveAbilityYaml(preset.yaml);
+    
+    handleSendPacket({
+      source: 'Portal Gun',
+      target: 'Living Network',
+      data: `LOAD_${preset.id.toUpperCase()}`
+    });
+    triggerTTS(`Cartridge Loaded: ${preset.name}`);
+  };
+
+  const handleUpdateYaml = (yaml: string) => {
+    setActiveAbilityYaml(yaml);
+    handleSendPacket({
+      source: 'Portal Editor',
+      target: 'Living Network',
+      data: `COMPILE_CUSTOM_YAML`
+    });
+    triggerTTS(`Injected custom YAML compiled successfully`);
+  };
+
+  const handleInjectPortal = () => {
+    handleSendPacket({
+      source: 'Portal Probe',
+      target: 'Main Out',
+      data: `LAUNCH_${activeAbilityId ? activeAbilityId.toUpperCase() : 'RAW_GRAV'}`
+    });
+    triggerTTS(`Resonant portal injection trigger dispatched`);
+  };
+
   const handleToggleAriaHidden = (id: string) => {
     setA11yNodes((prevNodes) =>
       prevNodes.map((node) => {
@@ -521,6 +631,12 @@ export default function App() {
     }
 
     try {
+      const systemState = autoSyncStats ? {
+        stats: stats,
+        ports: ports,
+        a11yHiddenCount: a11yNodes.filter(n => n.ariaHidden).length
+      } : null;
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -528,7 +644,9 @@ export default function App() {
         },
         body: JSON.stringify({
           message: msgToSend,
-          history: messages.slice(-10)
+          history: messages.slice(-10),
+          activeAbilityYaml: activeAbilityYaml || undefined,
+          systemState: systemState
         })
       });
 
@@ -817,6 +935,18 @@ export default function App() {
               />
             </div>
 
+            {/* Portal Gun & Modular Ability Chain Loader */}
+            <PortalGun
+              activeAbilityId={activeAbilityId}
+              activeAbilityYaml={activeAbilityYaml}
+              onSelectPreset={handleSelectPreset}
+              onUpdateYaml={handleUpdateYaml}
+              onInjectPortal={handleInjectPortal}
+              autoSyncStats={autoSyncStats}
+              onToggleAutoSync={() => setAutoSyncStats(!autoSyncStats)}
+              stats={stats}
+            />
+
             {/* 1. Synaptic Gateway Port Multiplexer (Conduid Hub) */}
             <div
               className={`transition-all duration-300 ${
@@ -845,6 +975,88 @@ export default function App() {
                 stats={stats}
                 onIncrementLoop={handleIncrementLoopFromComponent}
               />
+            </div>
+
+            {/* Symbolic Chemistry Tessellation Engine (Layer 4 & 10) */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('tessellation-chemistry-chamber')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-amber-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'tessellation-chemistry-chamber' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <TessellationEngine
+                onIncrementLoop={handleIncrementLoopFromComponent}
+              />
+            </div>
+
+            {/* Juliet Symmetric Semantic Workstation */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('juliet-living-computer-system-board')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-amber-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'juliet-living-computer-system-board' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <JulietComputer
+                onSendMessage={(msg) => handleSendChat(undefined, msg)}
+                onTriggerTTS={triggerTTS}
+              />
+            </div>
+
+            {/* SOPHIA Screen Interrogator & WebGL HUD station */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('ai-screen-interrogator-station')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-amber-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'ai-screen-interrogator-station' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <AIOverlayEngine />
+            </div>
+
+            {/* AGI Forecast & Google AI Timeline station */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('agi-timeline-tracker-station')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-amber-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'agi-timeline-tracker-station' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <AGITimelineTracker />
+            </div>
+
+            {/* UGI Nexus Hub */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('ugi-nexus-hub')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-red-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'ugi-nexus-hub' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <UGINexusHub />
+            </div>
+
+            {/* SOPHIA TS Virtual Computer */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('ts-virtual-computer')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-teal-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'ts-virtual-computer' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <TSVirtualComputer />
+            </div>
+
+            {/* Engram Memory Lattice & Transducer workstation */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('engram-memory-lattice-workstation')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-amber-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'engram-memory-lattice-workstation' ? 'ring-2 ring-teal-500' : ''}`}
+            >
+              <EngramMemoryEngine />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -942,8 +1154,34 @@ export default function App() {
                   </button>
               </div>
 
-              {/* Message List */}
-              {activeAiMode ? (
+              {/* Sidebar Tabs switcher */}
+              <div className="flex border-b border-slate-900 bg-slate-950 p-1 shrink-0 gap-1">
+                <button
+                  onClick={() => setSidebarTab('chat')}
+                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                    sidebarTab === 'chat'
+                      ? 'bg-emerald-600/10 text-emerald-400 border border-emerald-500/15 font-bold'
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  💬 Conversation
+                </button>
+                <button
+                  onClick={() => setSidebarTab('auditor')}
+                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                    sidebarTab === 'auditor'
+                      ? 'bg-red-500/10 text-red-500 border border-red-500/15 font-bold'
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  🛡️ Security Auditor
+                </button>
+              </div>
+
+              {/* Message List OR SecurityAuditor */}
+              {sidebarTab === 'auditor' ? (
+                <SecurityAuditor />
+              ) : activeAiMode ? (
                 <div className="flex flex-col h-full bg-slate-950">
                   <div className="flex items-center justify-between p-3 bg-slate-900 border-b border-slate-800 shrink-0">
                     <span className="text-xs font-mono text-emerald-400 flex items-center gap-2">
