@@ -20,6 +20,8 @@ import AGITimelineTracker from './components/AGITimelineTracker';
 import UGINexusHub from './components/UGINexusHub';
 import SecurityAuditor from './components/SecurityAuditor';
 import TSVirtualComputer from './components/TSVirtualComputer';
+import WaveRadarLoom from './components/WaveRadarLoom';
+import AriaVoiceGen from './components/AriaVoiceGen';
 import { ABILITY_PRESETS } from './data/abilities';
 
 // Firebase and auth
@@ -162,6 +164,24 @@ const INITIAL_A11Y_NODES: A11yElementNode[] = [
     ariaHidden: false,
     live: 'polite',
     description: 'A fully interactive TypeScript compiler and sandbox sandbox modeling adaptive recursive loops, ast optimizations, and local tool handshakes.',
+  },
+  {
+    id: 'wave-radar-loom',
+    tag: 'section',
+    role: 'region',
+    label: 'Wave Radar Loom Metamembrane Workspace',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Rhythmic wave radar loop tracker representing cognitive and emotional resonance with integrated creative constraint, fractal scaling and amplitude tracking.',
+  },
+  {
+    id: 'aria-voice-generator',
+    tag: 'section',
+    role: 'region',
+    label: 'Phonetic Aura Voice Gen Workstation',
+    ariaHidden: false,
+    live: 'polite',
+    description: 'Hardware speech synthesis module for compiling custom linguistic formants, syllables, and vocal soundboards.',
   },
 ];
 
@@ -1046,6 +1066,28 @@ export default function App() {
               } ${highlightedA11yNode === 'ts-virtual-computer' ? 'ring-2 ring-teal-500' : ''}`}
             >
               <TSVirtualComputer />
+            </div>
+
+            {/* Wave Radar Loom Metamembrane Workspace */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('wave-radar-loom')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-cyan-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'wave-radar-loom' ? 'ring-2 ring-cyan-500' : ''}`}
+            >
+              <WaveRadarLoom />
+            </div>
+
+            {/* Aria Voice Generator Workstation */}
+            <div
+              className={`transition-all duration-300 ${
+                isAriaHidden('aria-voice-generator')
+                  ? 'opacity-40 pointer-events-none select-none border-dashed scale-[0.98] border-purple-500 shadow-none'
+                  : ''
+              } ${highlightedA11yNode === 'aria-voice-generator' ? 'ring-2 ring-purple-500' : ''}`}
+            >
+              <AriaVoiceGen onIncrementLoop={handleIncrementLoopFromComponent} />
             </div>
 
             {/* Engram Memory Lattice & Transducer workstation */}
